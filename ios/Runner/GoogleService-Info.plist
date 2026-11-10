@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>518234485931-3l7ts2ep2t8brn5lcp42ikqvj2ledl0s.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.518234485931-3l7ts2ep2t8brn5lcp42ikqvj2ledl0s</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>518234485931-hg0lcgaqn6hmq7qqjjb0fkhhuhbv4ff4.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCs3lGdKAcd7E2U0Ojz9I9k3drRNBoCmlQ</string>
+	<key>GCM_SENDER_ID</key>
+	<string>518234485931</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.spotNugas</string>
+	<key>PROJECT_ID</key>
+	<string>spotnugas-c2781</string>
+	<key>STORAGE_BUCKET</key>
+	<string>spotnugas-c2781.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:518234485931:ios:9c5c541957b535dbdff3ee</string>
+</dict>
+</plist>

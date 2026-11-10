@@ -1,0 +1,23 @@
+# Regenerate with: dart run tool/generate_app_icons.dart
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/icons/app_icon.png
+  # AppColors.lightCream
+  adaptive_icon_background: "#ECEBD8"
+  adaptive_icon_foreground: assets/icons/app_icon_foreground.png
+  adaptive_icon_foreground_inset: 16
+  remove_alpha_ios: true
+  background_color_ios: "#ECEBD8"
+  web:
+    generate: true
+    image_path: assets/icons/app_icon.png
+    background_color: "#ECEBD8"
+    theme_color: "#ECEBD8"
+  windows:
+    generate: true
+    image_path: assets/icons/app_icon.png
+    icon_size: 256
+  macos:
+    generate: true
+    image_path: assets/icons/app_icon.png

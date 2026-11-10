@@ -1,0 +1,220 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Security Helper Functions
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    // Checks if the request is authenticated with any provider (including anonymous)
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Checks if the authenticated user matches the specified UID
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Checks if the user is signed in with a permanent/registered account (NOT anonymous guest)
+    function isRegisteredUser() {
+      return isSignedIn() &&
+        request.auth.token != null &&
+        request.auth.token.firebase != null &&
+        request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
+    // Checks if the authenticated user has verified admin claims via trusted custom claims token
+    // (Never trusts user-writable document fields to prevent self-assigned privileges)
+    function isAdmin() {
+      return isSignedIn() &&
+        request.auth.token != null &&
+        (request.auth.token.role == 'admin' || request.auth.token.admin == true);
+    }
+
+    // Checks if the authenticated user is a verified partner via trusted custom claims token
+    function isPartner() {
+      return isSignedIn() &&
+        request.auth.token != null &&
+        (request.auth.token.role == 'partner' || request.auth.token.partner == true);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 1. User Profiles: /users/{userId}
+    // ─────────────────────────────────────────────────────────────────────────────
+    match /users/{userId} {
+      // User can only read their own profile; admins can read any profile.
+      allow read: if isOwner(userId) || isAdmin();
+
+      function isProfileDataValid(data) {
+        return data.keys().hasOnly([
+            'uid', 'name', 'email', 'photoUrl', 'role',
+            'isGuest', 'onboardingCompleted', 'createdAt', 'updatedAt'
+          ])
+          && data.uid is string
+          && data.uid == userId
+          && data.name is string
+          && data.name.size() > 0
+          && data.name.size() <= 100
+          && (!('email' in data) || data.email == null || (data.email is string && data.email.size() <= 200))
+          && (!('photoUrl' in data) || data.photoUrl == null || (data.photoUrl is string && data.photoUrl.size() <= 1000))
+          && (!('isGuest' in data) || data.isGuest is bool)
+          && (!('onboardingCompleted' in data) || data.onboardingCompleted is bool)
+          && (!('createdAt' in data) || data.createdAt is timestamp)
+          && (!('updatedAt' in data) || data.updatedAt is timestamp);
+      }
+
+      // Creation: must be own UID, initial role MUST be 'user', valid schema
+      allow create: if isOwner(userId)
+                    && request.resource.data.role == 'user'
+                    && isProfileDataValid(request.resource.data);
+
+      // Update: must be own UID, role and uid immutable, createdAt immutable
+      allow update: if isOwner(userId)
+                    && request.resource.data.role == resource.data.role
+                    && request.resource.data.uid == resource.data.uid
+                    && (!('createdAt' in resource.data) || request.resource.data.createdAt == resource.data.createdAt)
+                    && isProfileDataValid(request.resource.data);
+
+      // Profile deletion is disabled from client SDKs to protect account history & referential integrity
+      allow delete: if false;
+
+      // ───────────────────────────────────────────────────────────────────────────
+      // 2. Private Saved Places / Bookmarks: /users/{userId}/saved_places/{placeId}
+      // ───────────────────────────────────────────────────────────────────────────
+      match /saved_places/{placeId} {
+        // Strict user isolation:
+        // - Owner (including anonymous guest) CAN read their own bookmarks.
+        // - Another user CANNOT read or write private saved data.
+        allow read: if isOwner(userId);
+
+        function isSavedPlaceValid(data) {
+          return data.keys().hasOnly([
+              'placeId', 'name', 'category', 'image', 'rating',
+              'priceLabel', 'address', 'savedAt', 'source'
+            ])
+            && data.keys().hasAll(['placeId', 'savedAt'])
+            && data.placeId is string
+            && data.placeId == placeId
+            && data.savedAt is timestamp
+            && (!('name' in data) || (data.name is string && data.name.size() > 0 && data.name.size() <= 200))
+            && (!('category' in data) || (data.category is string && data.category.size() <= 100))
+            && (!('image' in data) || (data.image is string && data.image.size() <= 1000))
+            && (!('rating' in data) || (data.rating is number && data.rating >= 0.0 && data.rating <= 5.0))
+            && (!('priceLabel' in data) || (data.priceLabel is string && data.priceLabel.size() <= 50))
+            && (!('address' in data) || data.address == null || (data.address is string && data.address.size() <= 500))
+            && (!('source' in data) || data.source in ['google', 'geoapify', 'manual']);
+        }
+
+        // Create: owner only, valid schema, no arbitrary injected fields
+        allow create: if isOwner(userId) && isSavedPlaceValid(request.resource.data);
+
+        // Bookmark update is denied (create / delete only policy enforced)
+        allow update: if false;
+
+        // Delete: owner only
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 3. Public Places Catalog & Aggregates: /places/{placeId}
+    // ─────────────────────────────────────────────────────────────────────────────
+    match /places/{placeId} {
+      // Publicly readable by all users (anonymous, registered, or unauthenticated)
+      allow read: if true;
+
+      // STRICT HARDENING: Direct client writes to studyScore, aggregate counters,
+      // and place directory data are COMPLETELY DENIED.
+      // Places and aggregates can only be modified via Server SDK or Cloud Functions.
+      allow write: if false;
+
+      // ───────────────────────────────────────────────────────────────────────────
+      // 4. Public Reviews: /places/{placeId}/reviews/{reviewId}
+      // ───────────────────────────────────────────────────────────────────────────
+      match /reviews/{reviewId} {
+        // Reviews are publicly readable by anyone (parent place document does not need to exist)
+        allow read: if true;
+
+        function isRatingValid(val) {
+          return val is number && val >= 1.0 && val <= 5.0;
+        }
+
+        function isReviewCommonValid(data) {
+          return data.keys().hasOnly([
+              'placeId', 'userId', 'userName', 'userAvatar',
+              'rating', 'comment', 'visitPurpose',
+              'wifiRating', 'outletRating', 'comfortRating', 'noiseRating', 'priceValueRating',
+              'createdAt', 'updatedAt'
+            ])
+            && isRatingValid(data.rating)
+            && data.comment is string
+            && data.comment.size() >= 3
+            && data.comment.size() <= 2000
+            && (!('userName' in data) || (data.userName is string && data.userName.size() > 0 && data.userName.size() <= 100))
+            && (!('userAvatar' in data) || data.userAvatar == null || (data.userAvatar is string && data.userAvatar.size() <= 1000))
+            && (!('visitPurpose' in data) || data.visitPurpose == null || (data.visitPurpose is string && data.visitPurpose.size() <= 100))
+            // Optional sub-scores must be valid numbers between 1.0 and 5.0
+            && (!('wifiRating' in data) || isRatingValid(data.wifiRating))
+            && (!('outletRating' in data) || isRatingValid(data.outletRating))
+            && (!('comfortRating' in data) || isRatingValid(data.comfortRating))
+            && (!('noiseRating' in data) || isRatingValid(data.noiseRating))
+            && (!('priceValueRating' in data) || isRatingValid(data.priceValueRating))
+            // Privacy leak prevention: Absolutely NO email or phone in public reviews
+            && !('email' in data)
+            && !('userEmail' in data)
+            && !('phoneNumber' in data)
+            && !('phone' in data);
+        }
+
+        // CREATE Review constraints:
+        // - Anonymous guests CANNOT publish reviews (must be registered user).
+        // - Registered user can publish only ONE review per place (reviewId == auth.uid).
+        // - Rating must be a number between 1.0 and 5.0.
+        // - Sub-scores (including priceValueRating) must be numbers between 1.0 and 5.0.
+        // - Identity/ownership fields must match auth context.
+        // - createdAt must be a valid timestamp.
+        allow create: if isRegisteredUser()
+                      && reviewId == request.auth.uid
+                      && request.resource.data.userId == request.auth.uid
+                      && request.resource.data.placeId == placeId
+                      && request.resource.data.createdAt is timestamp
+                      && isReviewCommonValid(request.resource.data);
+
+        // UPDATE Review constraints:
+        // - Only the review owner can edit their own review.
+        // - User cannot edit another user's review.
+        // - Anonymous guests cannot edit.
+        // - Identity/ownership fields CANNOT be changed (userId, placeId, createdAt are immutable).
+        // - Optional updatedAt must be a valid timestamp.
+        allow update: if isRegisteredUser()
+                      && isOwner(resource.data.userId)
+                      && request.resource.data.userId == resource.data.userId
+                      && request.resource.data.placeId == resource.data.placeId
+                      && request.resource.data.createdAt == resource.data.createdAt
+                      && (!('updatedAt' in request.resource.data) || request.resource.data.updatedAt is timestamp)
+                      && isReviewCommonValid(request.resource.data);
+
+        // DELETE Review constraints:
+        // - Only author or Admin can delete review
+        allow delete: if (isSignedIn() && isOwner(resource.data.userId)) || isAdmin();
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 5. System, Partner, and Admin Collections: Strict deny for unauthorized users
+    // ─────────────────────────────────────────────────────────────────────────────
+    match /partners/{partnerId}/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /admin/{adminDoc}/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /{document=**} {
+      // Default deny all other paths
+      allow read, write: if false;
+    }
+  }
+}

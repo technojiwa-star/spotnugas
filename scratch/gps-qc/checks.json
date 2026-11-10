@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-20",
+  "timezone": "Asia/Jakarta",
+  "repository": {
+    "branch": "master",
+    "hasInitialCommit": false,
+    "sourceFilesUntracked": true
+  },
+  "flutter": "3.44.2",
+  "dart": "3.12.2",
+  "analyze": {
+    "issues": 0,
+    "exitCode": 0
+  },
+  "test": {
+    "passed": 198,
+    "failed": 0,
+    "skipped": 2,
+    "exitCode": 0
+  },
+  "keyedUiTest": {
+    "passed": 15,
+    "failed": 0,
+    "skipped": 0,
+    "usesRealApiKey": false,
+    "exitCode": 0
+  },
+  "debugApk": {
+    "exitCode": 0,
+    "explicitDartDefineFile": true,
+    "path": "build/app/outputs/flutter-apk/app-debug.apk",
+    "bytes": 205031430,
+    "sha256": "5569f32fed8f2e97fd6a95f74f7b2b08e971ec6b12c7475b2093f933ac96429c",
+    "installedApkMatches": true
+  },
+  "emulator": {
+    "avd": "SpotNugas_API_34",
+    "deviceId": "emulator-5554",
+    "android": "14 / API 34"
+  }
+}

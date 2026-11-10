@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "518234485931",
+    "project_id": "spotnugas-c2781",
+    "storage_bucket": "spotnugas-c2781.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:518234485931:android:77ca4ca23e67090ddff3ee",
+        "android_client_info": {
+          "package_name": "com.spotnugas.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "518234485931-hg0lcgaqn6hmq7qqjjb0fkhhuhbv4ff4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.spotnugas.app",
+            "certificate_hash": "6b57bbeb38ef1517d57db9d4611403b13ae85c9d"
+          }
+        },
+        {
+          "client_id": "518234485931-4tmgvm905bs3tt3dgj82qqucqg0b8qoc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBg6mBrhRKJCiCn9IzT3uvUuSyWb8mnHAQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "518234485931-4tmgvm905bs3tt3dgj82qqucqg0b8qoc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "518234485931-3l7ts2ep2t8brn5lcp42ikqvj2ledl0s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.spotNugas"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,42 @@
+{
+  "scenario": "denied-manual-bandung",
+  "ui": [
+    "Bandung",
+    "Halo! Mau nugas\ndi mana hari ini? ☕",
+    "Semua",
+    "Fokus Sendiri",
+    "Nugas Kelompok",
+    "Tanya SpotAI\nRekomendasi instan sesuai budget & colokan",
+    "Rekomendasi Buat Kamu",
+    "Lihat Semua",
+    "100 m\nJam belum tersedia\n-\n0.0 (0)\nKedai Kopi Oh\nCafe\n-",
+    "Beranda",
+    "Jelajah",
+    "SpotAI",
+    "Tersimpan",
+    "Profil"
+  ],
+  "deviceGps": [
+    "last location=Location[gps 1.000000,-140.000000 hAcc=5.0 et=+2h32m9s640ms alt=0.0 vAcc=0.5 vel=0.0 sAcc=0.5 bear=0.0 bAcc=30.0 {Bundle[{satellites=0, maxCn0=0, meanCn0=0}]}]",
+    "last location=Location[gps 1.000000,-140.000000 hAcc=5.0 et=+2h32m9s640ms alt=0.0 vAcc=0.5 vel=0.0 sAcc=0.5 bear=0.0 bAcc=30.0 {Bundle[{satellites=0, maxCn0=0, meanCn0=0}]}]"
+  ],
+  "osLocationPermissions": [
+    "android.permission.ACCESS_NETWORK_STATE: granted=true",
+    "android.permission.ACCESS_FINE_LOCATION: granted=false, flags=[ USER_SET|USER_FIXED|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]",
+    "android.permission.ACCESS_COARSE_LOCATION: granted=false, flags=[ USER_SET|USER_FIXED|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]"
+  ],
+  "apiKeyFoundInRawLog": false,
+  "logs": [
+    "I/flutter (16046): [SpotNugas][Location] detectDeviceLocation(force: false) start (hasApiKey=[REDACTED] keyLength=32)",
+    "I/flutter (16046): [SpotNugas][Location] getCurrentLocation failed: status=LocationPermissionStatus.permanentlyDenied",
+    "I/flutter (16046): [SpotNugas][Location] setManualLocation: label=\"Bandung\", isMock=false",
+    "I/flutter (16046): [SpotNugas][GeoapifyDataSource] fetchNearbyPlaces: radius=5000m, limit=20, hasApiKey=[REDACTED] keyLength=32",
+    "I/flutter (16046): [SpotNugas][HomeScreen] _loadPlaces start: label=\"Bandung\", source=LocationSource.manual, repo=GeoapifyPlaceRepository",
+    "I/flutter (16046): [SpotNugas][GeoapifyDataSource] HTTP 200",
+    "I/flutter (16046): [SpotNugas][GeoapifyDataSource] HTTP 200 -> rawFeatures=20, uniqueParsedPlaces=20",
+    "I/flutter (16046): [SpotNugas][GeoapifyRepo] getNearbyPlaces: radiusKm=5.0 -> apiCount=20, mergedCount=20, returnedCount=20",
+    "I/flutter (16046): [SpotNugas][GeoapifyRepo] getNearbyPlaces: radiusKm=5.0 -> apiCount=20, mergedCount=20, returnedCount=20",
+    "I/flutter (16046): [SpotNugas][HomeScreen] _loadPlaces success: apiPlaces=20, selectedCategory=\"Semua\", afterFilter=20",
+    "I/flutter (16046): [SpotNugas][GeoapifyRepo] getNearbyPlaces: radiusKm=5.0 -> apiCount=20, mergedCount=20, returnedCount=20"
+  ]
+}

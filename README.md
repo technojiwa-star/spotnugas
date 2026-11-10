@@ -30,3 +30,4 @@ dart run tool/generate_app_icons.dart
 The generator preserves the logo's proportions and adds padding for launcher
 masks. Rebuild and install the app to see icon changes; hot reload does not
 update native launcher resources.
+# spotnugas
